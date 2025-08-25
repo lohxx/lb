@@ -1,0 +1,8 @@
+[workspace]
+members = [
+  "metrics",
+  "service_discovery",
+  "load_balancer"
+]
+
+
