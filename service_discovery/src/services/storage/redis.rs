@@ -1,38 +1,38 @@
 use redis::Commands;
 use redis::{Client, Connection};
-use redis::RedisResult;
-use redis::ToRedisArgs;
+
+use std::error::Error;
+
 
 use crate::services::storage::{Storage};
 
 pub struct RedisStore {
-    client: Client,
-    connection: Option<Connection>
+    connection: Connection
 }
 
 impl RedisStore {
     pub fn new() -> Self {
-        let client = Client::open("redis://127.0.0.1").unwrap();
+        let client: Client = Client::open("redis://127.0.0.1").unwrap();
 
         RedisStore { 
-            // deixar variavel conforme as configurações da aplicação.
-            client: client,
-            connection: None
+            connection: client.get_connection().unwrap()
         }
     }
 }
 
 impl Storage for RedisStore {
-    fn get<T>(&self, identifier: T) -> Option<T> {
-        let connection: Connection = self.client.get_connection().unwrap();
-        None
+    fn get(&mut self, identifier: &str) -> Result<Option<String>, Box<dyn Error>> {
+        let result: Option<String> = self.connection.get(identifier)?;
+        Ok(result)
     }
 
-    fn save<T>(&self, entity: T) -> Option<T> {
-        None
+    fn save(&mut self, key: &str, value: &str) -> Result<(), Box<dyn Error>> {
+        let _: () = self.connection.set(key, value)?;
+        Ok(())
     }
 
-    fn update<T>(&self, entity: T) -> Option<T> {
-        None
+    fn update(&mut self, identifier: &str, value: &str) -> Result<(), Box<dyn Error>> {
+        self.save(identifier, value);
+        Ok(())
     }
 }

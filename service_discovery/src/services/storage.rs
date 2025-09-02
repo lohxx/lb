@@ -1,12 +1,13 @@
-use std::any::Any;
-
 pub mod redis;
 pub mod sqlite;
 
+use std::error::Error;
+
+
 pub trait Storage {
-    fn save<T>(&self, entity: T) -> Option<T>;
-    fn get<T>(&self, identifier: T) -> Option<T>;
-    fn update<T>(&self, entity: T) -> Option<T>;
+    fn save(&mut self, identifier: &str, value: &str) -> Result<(), Box<dyn Error>>;
+    fn update(&mut self, identifier: &str, value: &str) -> Result<(), Box<dyn Error>>;
+    fn get(&mut self, identifier: &str) -> Result<Option<String>, Box<dyn Error>>;
 }
 
 pub fn storage_strategy() -> impl Storage {
