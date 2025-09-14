@@ -8,24 +8,32 @@ pub enum Health {
     NotOk
 }
 
+#[derive(Deserialize, Clone, Serialize)]
+pub struct HealthStatus {
+    status: Health,
+    last_succesful_check: Option<SystemTime>,
+    last_error_status: u64
+}
+
+#[derive(Deserialize, Clone, Serialize)]
+pub struct HealthCheckConfiguration {
+    period: u64,
+    endpoint: String,
+    health_status: HealthStatus
+}
+
 
 #[derive(Deserialize, Clone, Serialize)]
 pub struct Server {
-    ip_address: IpAddr,
     port: u32,
+    ip_address: IpAddr,
     label: Option<String>,
-    last_heartbeat: Option<SystemTime>,
-    status: Option<Health>
+    health_check_configuration: Option<HealthCheckConfiguration>
 }
 
 
 impl Server {
     pub fn key(&self) -> String {
         [self.ip_address.to_string() + &self.port.to_string()].join("-")
-    }
-
-    pub fn add_heartbeat(&mut self) -> () {
-        self.last_heartbeat = Some(SystemTime::now());
-        self.status = Some(Health::Ok);
     }
 }
