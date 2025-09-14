@@ -1,4 +1,5 @@
 use crate::discovery;
+use crate::types;
 
 // Salvar os serviços registrados e rodar health_checks, o cliente que vai determinar a peridiocidade do health check?
 // Se sim, vamos precisar de um loop que verifica as chamadas e marca o serviço como saudavel ou não, isso em conjunto
@@ -6,7 +7,7 @@ use crate::discovery;
 
 pub fn check_servers_health_state() {
     loop {
-        let mut _servers: Vec<discovery::Server> = discovery::get_availble_services();
+        let mut _servers: Vec<types::Server> = discovery::get_availble_services();
 
         // Dispara a verificação entre varias threads
 
