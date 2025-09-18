@@ -19,12 +19,6 @@ impl RedisStore {
         }
     }
 
-    pub fn get(&mut self, identifier: &str) -> Result<Server, Box<dyn Error>> {
-        let result: Option<String> = Commands::get(&mut self.connection, identifier)?;
-        let deserialized_data: Server = serde_json::from_str(result.unwrap().as_str()).unwrap();
-        Ok(deserialized_data)
-    }
-
     pub fn save(&mut self, key: &str, value: Server, save_as: Option<RedisDS>) -> Result<(), Box<dyn Error>> {
         let serialized_value = serde_json::to_string(&value).unwrap();
         match save_as {
@@ -33,6 +27,18 @@ impl RedisStore {
             _ => Commands::set(&mut self.connection, key, serialized_value)?
         };
 
+        Ok(())
+    }
+}
+
+impl Storage for RedisStore {
+    fn get(&mut self, identifier: &str) -> Result<Server, Box<dyn Error>> {
+        let result: Option<String> = Commands::get(&mut self.connection, identifier)?;
+        let deserialized_data: Server = serde_json::from_str(result.unwrap().as_str()).unwrap();
+        Ok(deserialized_data)
+    }
+
+    fn update(&mut self, identifier: &str, value: Server) -> Result<(), Box<dyn Error>> {
         Ok(())
     }
 
