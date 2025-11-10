@@ -6,6 +6,12 @@ use std::error::Error;
 use crate::services::storage::{Storage};
 use crate::types::Server;
 
+pub enum RedisDS {
+    Hash,
+    Set,
+    List
+}
+
 pub struct RedisStore {
     connection: Connection
 }
@@ -18,34 +24,30 @@ impl RedisStore {
             connection: client.get_connection().unwrap()
         }
     }
-
-    pub fn save(&mut self, key: &str, value: Server, save_as: Option<RedisDS>) -> Result<(), Box<dyn Error>> {
-        let serialized_value = serde_json::to_string(&value).unwrap();
-        match save_as {
-            Some(RedisDS::Hash) => self.connection.set(key, serialized_value)?,
-            Some(RedisDS::Set) => self.connection.sadd(key, serialized_value)?,
-            _ => Commands::set(&mut self.connection, key, serialized_value)?
-        };
-
-        Ok(())
-    }
 }
 
 impl Storage for RedisStore {
     fn get(&mut self, identifier: &str) -> Result<Server, Box<dyn Error>> {
         let result: Option<String> = Commands::get(&mut self.connection, identifier)?;
         let deserialized_data: Server = serde_json::from_str(result.unwrap().as_str()).unwrap();
-        Ok(deserialized_data)
+        Ok(deserialized_data.clone())
     }
 
     fn update(&mut self, identifier: &str, value: Server) -> Result<(), Box<dyn Error>> {
         Ok(())
     }
 
+    fn get_servers_checked_from_last_seconds(&mut self, last_time_checked: u64) -> Result<Vec<Server>, Box<dyn Error>> {
+        Ok(vec![])
+    }
+
+    fn save(&mut self, value: Server) -> Result<(), Box<dyn Error>> {
+        let key = value.key();
+        let serialized_value = serde_json::to_string(&value).unwrap();
+        self.connection.set(key, serialized_value)
+
+        Ok()
+    }
+
 }
 
-pub enum RedisDS {
-    Hash,
-    Set,
-    List
-}

@@ -1,15 +1,22 @@
 use crate::discovery;
 use crate::types;
-
+use rust_task_queue::cli::start_worker;
 
 use std::time::SystemTime;
 
 use crate::services::storage::{storage_strategy, Storage};
 use crate::types::{Health, Server};
 
+
+struct HealthChecker {
+    
+}
+
 trait ServicesStatus {
     fn get_registered_services(&self) -> Vec<Server>;
 }
+
+impl Server for 
 
 // Salvar os serviços registrados e rodar health_checks, o cliente que vai determinar a peridiocidade do health check?
 // Se sim, vamos precisar de um loop que verifica as chamadas e marca o serviço como saudavel ou não, isso em conjunto

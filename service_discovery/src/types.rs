@@ -1,6 +1,9 @@
 use serde::{Deserialize, Serialize};
 use std::net::{IpAddr};
-use std::time::SystemTime;
+use std::time::{Duration, SystemTime};
+use uuid::{uuid, Uuid};
+
+
 
 #[derive(Deserialize, Clone, Serialize)]
 pub enum Health {
@@ -17,15 +20,18 @@ pub struct HealthStatus {
 
 #[derive(Deserialize, Clone, Serialize)]
 pub struct HealthCheckConfiguration {
-    period: u64,
+    timeout: u32,
+    period: Duration,
     endpoint: String,
-    health_status: HealthStatus
+    max_attempts: u32,
+    health_status: HealthStatus,
 }
 
 
 #[derive(Deserialize, Clone, Serialize)]
 pub struct Server {
     port: u32,
+    id: Uuid,
     ip_address: IpAddr,
     label: Option<String>,
     health_check_configuration: Option<HealthCheckConfiguration>
